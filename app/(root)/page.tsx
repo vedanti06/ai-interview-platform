@@ -9,17 +9,20 @@ import {
   getInterviewsByUserId,
   getLatestInterviews,
 } from "@/lib/actions/general.action";
+import { redirect } from "next/navigation";
 
 async function Home() {
   const user = await getCurrentUser();
-
+  if (!user) {
+    redirect("/sign-in");
+  }
   const [userInterviews, allInterview] = await Promise.all([
-    getInterviewsByUserId(user?.id!),
-    getLatestInterviews({ userId: user?.id! }),
+    getInterviewsByUserId(user.id),
+    getLatestInterviews({ userId: user.id }),
   ]);
 
-  const hasPastInterviews = userInterviews?.length! > 0;
-  const hasUpcomingInterviews = allInterview?.length! > 0;
+  const hasPastInterviews = userInterviews?.length!=undefined;
+  const hasUpcomingInterviews = allInterview?.length!=undefined;
 
   return (
     <>

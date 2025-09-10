@@ -3,16 +3,16 @@
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
 
-// Session duration (1 week)
-const SESSION_DURATION = 60 * 60 * 24 * 7;
 
-// Set session cookie
+const SESSION_DURATION = 60*60*24*7;
+
+
 export async function setSessionCookie(idToken: string) {
   const cookieStore = await cookies();
 
-  // Create session cookie
+ 
   const sessionCookie = await auth.createSessionCookie(idToken, {
-    expiresIn: SESSION_DURATION * 1000, // milliseconds
+    expiresIn: SESSION_DURATION * 1000, 
   });
 
   // Set cookie in the browser
@@ -41,14 +41,13 @@ export async function signUp(params: SignUpParams) {
     await db.collection("users").doc(uid).set({
       name,
       email,
-      // profileURL,
-      // resumeURL,
     });
 
     return {
       success: true,
       message: "Account created successfully. Please sign in.",
     };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error creating user:", error);
 
@@ -79,7 +78,7 @@ export async function signIn(params: SignInParams) {
       };
 
     await setSessionCookie(idToken);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log("");
 
     return {
@@ -89,7 +88,6 @@ export async function signIn(params: SignInParams) {
   }
 }
 
-// Sign out user by clearing the session cookie
 export async function signOut() {
   const cookieStore = await cookies();
 

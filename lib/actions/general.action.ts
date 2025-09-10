@@ -74,6 +74,8 @@ export async function getFeedbackByInterviewId(
   params: GetFeedbackByInterviewIdParams
 ): Promise<Feedback | null> {
   const { interviewId, userId } = params;
+  if (!userId) 
+    return {} as Feedback;
 
   const querySnapshot = await db
     .collection("feedback")
@@ -92,7 +94,8 @@ export async function getLatestInterviews(
   params: GetLatestInterviewsParams
 ): Promise<Interview[] | null> {
   const { userId, limit = 20 } = params;
-
+  if (!userId) 
+    return null;
   const interviews = await db
     .collection("interviews")
     .where("finalized", "==", true)
@@ -111,6 +114,8 @@ export async function getLatestInterviews(
 export async function getInterviewsByUserId(
   userId: string
 ): Promise<Interview[] | null> {
+  if (!userId) return null;
+
   const interviews = await db
     .collection("interviews")
     .where("userId", "==", userId)
