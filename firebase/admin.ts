@@ -5,10 +5,9 @@ import { getFirestore } from "firebase-admin/firestore";
 
 function initFirebaseAdmin() {
   const apps = getApps();
+  
 
   if (!apps.length) {
-    // Check if we have the required environment variables
-   
     console.log(
         'Admin env check',
         !!process.env.FIREBASE_PROJECT_ID,
@@ -16,6 +15,7 @@ function initFirebaseAdmin() {
         (process.env.FIREBASE_PRIVATE_KEY || '').length
       );
     initializeApp({
+      
       credential: cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,

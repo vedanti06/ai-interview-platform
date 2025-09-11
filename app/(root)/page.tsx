@@ -20,10 +20,11 @@ async function Home() {
     getInterviewsByUserId(user.id),
     getLatestInterviews({ userId: user.id }),
   ]);
-
-  const hasPastInterviews = userInterviews?.length!=undefined;
-  const hasUpcomingInterviews = allInterview?.length!=undefined;
-
+  
+  // const hasPastInterviews = userInterviews?.length!=undefined;
+  // const hasUpcomingInterviews = allInterview?.length!=undefined;
+const hasPastInterviews = Array.isArray(userInterviews) && userInterviews.length > 0;
+const hasUpcomingInterviews = Array.isArray(allInterview) && allInterview.length > 0;
   return (
     <>
       <section className="card-cta">
@@ -49,7 +50,7 @@ async function Home() {
 
       <section className="flex flex-col gap-6 mt-8">
         <h2>Your Interviews</h2>
-
+ 
         <div className="interviews-section">
           {hasPastInterviews ? (
             userInterviews?.map((interview) => (
