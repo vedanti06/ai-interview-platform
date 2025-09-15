@@ -48,18 +48,18 @@ git clone https://github.com/vedanti06/ai-interview-platform.git
 cd ai-interview-platform
 
 # Install dependencies
-```bash
+
 npm install   # or yarn / pnpm
 
 # Run locally
-```bash
+
 npm run dev
 
 🔑 Configuration
 
 You’ll need Firebase credentials (or your own auth provider).
 Create a .env.local file and add:
-```bash
+
 NEXT_PUBLIC_FIREBASE_API_KEY=xxxx
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=xxxx
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=xxxx
@@ -68,7 +68,7 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=xxxx
 NEXT_PUBLIC_FIREBASE_APP_ID=xxxx
 
 📂 Project Structure
-```bash
+
 app/                → Next.js routes & pages
 components/         → Reusable React components
 constants/          → Centralized enums, configs
@@ -77,17 +77,6 @@ lib/                → Utility functions & helpers
 public/             → Static assets
 types/              → TypeScript definitions
 
-🚀 Deployment
-
-Easiest way? Vercel.
-
-Push your repo to GitHub
-
-Import project in Vercel
-
-Add your .env variables in the dashboard
-
-Click Deploy → 🎉 You’re live!
 
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
