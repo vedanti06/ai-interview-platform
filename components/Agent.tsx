@@ -29,7 +29,6 @@ const Agent = ({
   type,
   questions,
 }: AgentProps) => {
-  
   const router = useRouter();
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
@@ -90,6 +89,8 @@ const Agent = ({
 
     const handleGenerateFeedback = async (messages: SavedMessage[]) => {
       console.log("handleGenerateFeedback");
+      console.log({ interviewId, userId, feedbackId });
+      console.log({ messages });
 
       const { success, feedbackId: id } = await createFeedback({
         interviewId: interviewId!,
@@ -119,18 +120,12 @@ const Agent = ({
     setCallStatus(CallStatus.CONNECTING);
 
     if (type === "generate") {
-      await vapi.start(
-        undefined,
-        undefined,
-        undefined,
-        process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!,
-        {
-          variableValues: {
-            username: userName!,
-            userid: userId!,
-          },
-        }
-      );
+      await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
+        variableValues: {
+          username: userName,
+          userid: userId,
+        },
+      });
     } else {
       let formattedQuestions = "";
       if (questions) {
@@ -138,7 +133,7 @@ const Agent = ({
           .map((question) => `- ${question}`)
           .join("\n");
       }
-      console.log("formattedQuestions", formattedQuestions);
+
       await vapi.start(interviewer, {
         variableValues: {
           questions: formattedQuestions,
@@ -169,7 +164,7 @@ const Agent = ({
           <h3>AI Interviewer</h3>
         </div>
 
-    
+        {/* User Profile Card */}
         <div className="card-border">
           <div className="card-content">
             <Image
@@ -200,7 +195,7 @@ const Agent = ({
         </div>
       )}
 
-    <div className="w-full flex justify-center">
+      <div className="w-full flex justify-center">
         {callStatus !== "ACTIVE" ? (
           <button className="relative btn-call" onClick={() => handleCall()}>
             <span

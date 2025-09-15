@@ -5,36 +5,72 @@ import { google } from "@ai-sdk/google";
 
 import { db } from "@/firebase/admin";
 import { feedbackSchema } from "@/constants";
+import z from "zod";
 
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript, feedbackId } = params;
+  console.log(interviewId, userId, transcript, feedbackId);  
 
   try {
-    const formattedTranscript = transcript
-      .map(
-        (sentence: { role: string; content: string }) =>
-          `- ${sentence.role}: ${sentence.content}\n`
-      )
-      .join("");
+    // const formattedTranscript = transcript
+    //   .map(
+    //     (sentence: { role: string; content: string }) =>
+    //       `- ${sentence.role}: ${sentence.content}\n`
+    //   )
+    //   .join("");
 
     const { object } = await generateObject({
-      model: google("gemini-2.0-flash-001"),
-      schema: feedbackSchema,
-      prompt: `
-        You are an AI interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories. Be thorough and detailed in your analysis. Don't be lenient with the candidate. If there are mistakes or areas for improvement, point them out.
-        Transcript:
-        ${formattedTranscript}
+      model: google("gemini-2.5-pro"),
+      schema: z.object({
+        totalScore: z.number(),
+        categoryScores: z.array(
+          z.object({
+            name: z.enum([
+              "Communication Skills",
+              "Technical Knowledge",
+             
+              "Problem Solving",
+              "Cultural Fit",
+              "Confidence and Clarity",
+            ]),
+            score: z.number(),
+            comment: z.string(),
+          })
+        ),
+        strengths: z.array(z.string()),
+        areasForImprovement: z.array(z.string()),
+        finalAssessment: z.string(),
+      }),
+      prompt:  `You are an AI interviewer analyzing a mock interview. 
+        Return JSON that matches the schema exactly.
 
-        Please score the candidate from 0 to 100 in the following areas. Do not add categories other than the ones provided:
-        - **Communication Skills**: Clarity, articulation, structured responses.
-        - **Technical Knowledge**: Understanding of key concepts for the role.
-        - **Problem-Solving**: Ability to analyze problems and propose solutions.
-        - **Cultural & Role Fit**: Alignment with company values and job role.
-        - **Confidence & Clarity**: Confidence in responses, engagement, and clarity.
-        `,
+        Transcript:
+        '${transcript.map((t) => `${t.role}: ${t.content}`).join("\n")}'
+
+        Provide:
+        - totalScore (0–100)
+        - categoryScores (5 objects with name, score, comment)
+        - strengths (array of strings)
+        - areasForImprovement (array of strings)
+        - finalAssessment (string)
+      `,
       system:
         "You are a professional interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories",
     });
+ console.log("Generated object raw:", JSON.stringify(object, null, 2));
+
+    console.log({ object });
+   
+
+    if (!object || !object.totalScore) {
+      throw new Error("Failed to generate feedback. Please try again.");
+    } 
+    console.log(object.totalScore); 
+    console.log(object.categoryScores);
+    console.log(object.strengths);
+    console.log(object.areasForImprovement);
+    console.log(object.finalAssessment);  
+
 
     const feedback = {
       interviewId: interviewId,
@@ -47,7 +83,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
       createdAt: new Date().toISOString(),
     };
 
-    let feedbackRef;
+   let feedbackRef;
 
     if (feedbackId) {
       feedbackRef = db.collection("feedback").doc(feedbackId);
@@ -58,10 +94,17 @@ export async function createFeedback(params: CreateFeedbackParams) {
     await feedbackRef.set(feedback);
 
     return { success: true, feedbackId: feedbackRef.id };
-  } catch (error) {
-    console.error("Error saving feedback:", error);
-    return { success: false };
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } 
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  catch (error: any) {
+  console.error("Error saving feedback:", error?.message, error);
+  return { success: false, error: error?.message || "Unknown error" };
+}
+
+
+  
 }
 
 export async function getInterviewById(id: string): Promise<Interview | null> {

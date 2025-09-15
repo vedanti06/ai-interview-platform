@@ -59,6 +59,13 @@ export async function signUp(params: SignUpParams) {
       };
     }
 
+    if (error.code === "auth/invalid-credential") {
+      return {
+        success: false,
+        message: "Invalid credentials provided",
+      };
+    }
+
     return {
       success: false,
       message: "Failed to create account. Please try again.",
@@ -78,8 +85,16 @@ export async function signIn(params: SignInParams) {
       };
 
     await setSessionCookie(idToken);
-  } catch (error: unknown) {
-    console.log("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error:", error);
+
+     if (error.code === "auth/invalid-credential") {
+      return {
+        success: false,
+        message: "Invalid credentials provided",
+      };
+    }
 
     return {
       success: false,
