@@ -6,7 +6,7 @@ Think of it as your **personal AI-powered mock interviewer** that doesn’t get 
 
 ---
 
-## ✨ Why This Project Exists  
+## ✨ Purpose   
 
 Traditional interview prep is either too rigid (question banks) or too costly (mock interviews).  
 This platform solves that by combining **Next.js + TypeScript** with **AI capabilities** to create:  
